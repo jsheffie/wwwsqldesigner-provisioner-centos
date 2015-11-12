@@ -3,8 +3,26 @@
 - hosts: all
   sudo: yes
   tasks:
-  - name: Ensure NTP ( for time synchronization ) is installed.
-    yum: name=ntp state=installed
+  - name: Install epel-release
+    yum: name=epel-release state=installed
+  - name: Install Packages
+    yum: pkg={{ item }} state=installed
+    with_items:
+      - screen
+      - nginx
+      - ntp
+      - git
+
   - name: Ensure NTP is running
     service: name=ntpd state=started enabled=yes
 
+  - name: Ensure nginx is running
+    service: name=nginx state=started enabled=yes
+
+  - name: Move nginx/html to html.distro
+    command: mv /usr/share/nginx/html /usr/share/nginx/html.distro
+
+  - name: Fetch wwwsqldesigner into tree
+    git: repo=https://github.com/ondras/wwwsqldesigner.git dest=/usr/share/nginx/html
+
+#/usr/share/nginx/html
